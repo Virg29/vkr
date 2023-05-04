@@ -1,0 +1,81 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+generator dbml {
+    provider = "prisma-dbml-generator"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Subscriber {
+    id             Int      @id @default(autoincrement())
+    firstName      String
+    lastName       String
+    dateOfBirth    DateTime
+    contactInfo    String
+    serviceAddress String
+    service        Service  @relation(fields: [serviceId], references: [id])
+    serviceId      Int
+
+    equipmentRentals EquipmentRental[]
+
+    supportTickets  SupportTicket[]
+    loyaltyStatus   LoyaltyStatus   @relation(fields: [loyaltyStatusId], references: [id])
+    loyaltyStatusId Int
+}
+
+model Service {
+    id           Int          @id @default(autoincrement())
+    serviceName  String
+    subscribers  Subscriber[]
+    costPerMonth Float
+
+    serviceUsage ServiceUsage[]
+}
+
+model EquipmentRental {
+    id           Int        @id @default(autoincrement())
+    serialNumber String
+    description  String
+    costPerMonth Float
+    subscriber   Subscriber @relation(fields: [subscriberId], references: [id])
+    subscriberId Int
+}
+
+model SupportTicket {
+    id               Int             @id @default(autoincrement())
+    issueDescription String
+    chatHistory      String
+    employeeId       Int
+    subscriber       Subscriber      @relation(fields: [subscriberId], references: [id])
+    subscriberId     Int
+    ticketSummary    TicketSummary[]
+}
+
+model TicketSummary {
+    id              Int           @id @default(autoincrement())
+    issueResolved   Boolean
+    solutionSummary String
+    ticket          SupportTicket @relation(fields: [ticketId], references: [id])
+    ticketId        Int
+}
+
+model ServiceUsage {
+    id           Int      @id @default(autoincrement())
+    usageDate    DateTime
+    service      Service  @relation(fields: [serviceId], references: [id])
+    serviceId    Int
+    subscriberId Int
+}
+
+model LoyaltyStatus {
+    id           Int          @id @default(autoincrement())
+    subscriberId Int
+    loyaltyLevel String
+    rating       Float
+    Subscriber   Subscriber[]
+}

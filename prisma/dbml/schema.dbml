@@ -1,0 +1,81 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table Subscriber {
+  id Int [pk, increment]
+  firstName String [not null]
+  lastName String [not null]
+  dateOfBirth DateTime [not null]
+  contactInfo String [not null]
+  serviceAddress String [not null]
+  service Service [not null]
+  serviceId Int [not null]
+  equipmentRentals EquipmentRental [not null]
+  supportTickets SupportTicket [not null]
+  loyaltyStatus LoyaltyStatus [not null]
+  loyaltyStatusId Int [not null]
+}
+
+Table Service {
+  id Int [pk, increment]
+  serviceName String [not null]
+  subscribers Subscriber [not null]
+  costPerMonth Float [not null]
+  serviceUsage ServiceUsage [not null]
+}
+
+Table EquipmentRental {
+  id Int [pk, increment]
+  serialNumber String [not null]
+  description String [not null]
+  costPerMonth Float [not null]
+  subscriber Subscriber [not null]
+  subscriberId Int [not null]
+}
+
+Table SupportTicket {
+  id Int [pk, increment]
+  issueDescription String [not null]
+  chatHistory String [not null]
+  employeeId Int [not null]
+  subscriber Subscriber [not null]
+  subscriberId Int [not null]
+  ticketSummary TicketSummary [not null]
+}
+
+Table TicketSummary {
+  id Int [pk, increment]
+  issueResolved Boolean [not null]
+  solutionSummary String [not null]
+  ticket SupportTicket [not null]
+  ticketId Int [not null]
+}
+
+Table ServiceUsage {
+  id Int [pk, increment]
+  usageDate DateTime [not null]
+  service Service [not null]
+  serviceId Int [not null]
+  subscriberId Int [not null]
+}
+
+Table LoyaltyStatus {
+  id Int [pk, increment]
+  subscriberId Int [not null]
+  loyaltyLevel String [not null]
+  rating Float [not null]
+  Subscriber Subscriber [not null]
+}
+
+Ref: Subscriber.serviceId > Service.id
+
+Ref: Subscriber.loyaltyStatusId > LoyaltyStatus.id
+
+Ref: EquipmentRental.subscriberId > Subscriber.id
+
+Ref: SupportTicket.subscriberId > Subscriber.id
+
+Ref: TicketSummary.ticketId > SupportTicket.id
+
+Ref: ServiceUsage.serviceId > Service.id

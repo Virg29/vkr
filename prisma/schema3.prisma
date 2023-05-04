@@ -1,0 +1,87 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+generator dbml {
+    provider = "prisma-dbml-generator"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Service {
+    id                  Int                     @id @default(autoincrement())
+    name                String
+    type                ServiceType             @relation(fields: [serviceTypeId], references: [id])
+    price               Float
+    resources           Float?
+    additionalInfo      AdditionalServiceInfo[]
+    serviceTypeId       Int
+    Service_restriction Service_restriction[]
+    Service_promotios   Service_promotios[]
+    Service_equipment   Service_equipment[]
+}
+
+model ServiceType {
+    id       Int       @id @default(autoincrement())
+    name     String
+    services Service[]
+}
+
+model Service_restriction {
+    id            Int         @id @default(autoincrement())
+    restriction   Restriction @relation(fields: [restrictionId], references: [id])
+    service       Service     @relation(fields: [serviceId], references: [id])
+    restrictionId Int
+    serviceId     Int
+}
+
+model Service_promotios {
+    id          Int       @id @default(autoincrement())
+    promotion   Promotion @relation(fields: [promotionId], references: [id])
+    service     Service   @relation(fields: [serviceId], references: [id])
+    serviceId   Int
+    promotionId Int
+}
+
+model Service_equipment {
+    id          Int       @id @default(autoincrement())
+    equipment   Equipment @relation(fields: [equipmentId], references: [id])
+    service     Service   @relation(fields: [serviceId], references: [id])
+    serviceId   Int
+    equipmentId Int
+}
+
+model Restriction {
+    id                  Int                   @id @default(autoincrement())
+    description         String
+    Service_restriction Service_restriction[]
+}
+
+model Promotion {
+    id                Int                 @id @default(autoincrement())
+    name              String
+    description       String
+    price             Float
+    serviceId         Int
+    Service_promotios Service_promotios[]
+}
+
+model Equipment {
+    id                Int                 @id @default(autoincrement())
+    name              String
+    type              String
+    price             Float
+    serviceId         Int
+    Service_equipment Service_equipment[]
+}
+
+model AdditionalServiceInfo {
+    id          Int     @id @default(autoincrement())
+    description String
+    price       Float
+    service     Service @relation(fields: [serviceId], references: [id])
+    serviceId   Int
+}

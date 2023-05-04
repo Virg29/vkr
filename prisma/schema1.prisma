@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+generator dbml {
+    provider = "prisma-dbml-generator"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model CommunicationLine {
+    id                 Int                  @id @default(autoincrement())
+    lineType           String
+    bandwidth          String
+    technicalInfo      String
+    startLocation      String
+    endLocation        String
+    laidDate           DateTime
+    // Relationships
+    devices            Device[] // One-to-many relationship with Device table
+    MaintenanceRequest MaintenanceRequest[]
+}
+
+// First table - Network Devices
+model NetworkDevice {
+    id       Int      @id @default(autoincrement())
+    brand    String
+    quantity Int
+    unitCost Float
+    // Relationships
+    devices  Device[] // One-to-many relationship with Device table
+}
+
+// Second table - Devices
+model Device {
+    id                     Int                   @id @default(autoincrement())
+    location               String
+    usageInfo              String
+    connectedTo            String
+    physicalAddr           String
+    // Relationships
+    networkDevice          NetworkDevice         @relation(fields: [networkDeviceId], references: [id])
+    networkDeviceId        Int
+    maintenanceRequests    MaintenanceRequest[] // One-to-many relationship with MaintenanceRequest table
+    AutonomousDataCenter   AutonomousDataCenter? @relation(fields: [autonomousDataCenterId], references: [id])
+    autonomousDataCenterId Int?
+    CommunicationLine      CommunicationLine?    @relation(fields: [communicationLineId], references: [id])
+    communicationLineId    Int?
+}
+
+// Third table - Maintenance Requests
+// Table - Maintenance Requests
+model MaintenanceRequest {
+    id                  Int               @id @default(autoincrement())
+    issue               String
+    occurredAt          DateTime
+    // Relationships
+    device              Device            @relation(fields: [deviceId], references: [id])
+    deviceId            Int
+    communicationLine   CommunicationLine @relation(fields: [communicationLineId], references: [id])
+    communicationLineId Int
+}
+
+// Fourth table - Autonomous Data Centers
+model AutonomousDataCenter {
+    id       Int      @id @default(autoincrement())
+    name     String
+    location String
+    // Relationships
+    devices  Device[] // One-to-many relationship with Device table
+}
